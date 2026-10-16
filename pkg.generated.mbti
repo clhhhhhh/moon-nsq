@@ -217,6 +217,7 @@ pub struct ConnectionLease {
   endpoint : ProducerEndpoint
   generation : Int
   mut released : Bool
+  // private fields
 } derive(@debug.Debug)
 pub fn ConnectionLease::endpoint(Self) -> ProducerEndpoint
 pub fn ConnectionLease::generation(Self) -> Int

@@ -1,6 +1,7 @@
 ///|
 /// A lease returned by the endpoint pool before opening a TCP connection.
 pub struct ConnectionLease {
+  priv owner : PoolStats
   endpoint : ProducerEndpoint
   generation : Int
   mut released : Bool
@@ -126,6 +127,7 @@ pub fn ConnectionPool::lease(
   self.stats.leases += 1
   {
     endpoint: self.routing.choose(now_ms),
+    owner: self.stats,
     generation: self.generation,
     released: false,
   }
@@ -137,7 +139,7 @@ pub fn ConnectionPool::release(
   self : ConnectionPool,
   lease : ConnectionLease,
 ) -> Unit {
-  if !lease.released {
+  if physical_equal(lease.owner, self.stats) && !lease.released {
     lease.released = true
     if self.active > 0 {
       self.active -= 1
@@ -152,6 +154,11 @@ pub fn ConnectionPool::mark_failure(
   lease : ConnectionLease,
   now_ms : Int64,
 ) -> Bool {
+  if !physical_equal(lease.owner, self.stats) ||
+    lease.released ||
+    lease.generation != self.generation {
+    return false
+  }
   self.stats.failures += 1
   self.routing.mark_failure(lease.endpoint().address(), now_ms)
 }
@@ -161,6 +168,11 @@ pub fn ConnectionPool::mark_success(
   self : ConnectionPool,
   lease : ConnectionLease,
 ) -> Bool {
+  if !physical_equal(lease.owner, self.stats) ||
+    lease.released ||
+    lease.generation != self.generation {
+    return false
+  }
   self.stats.successes += 1
   self.routing.mark_success(lease.endpoint().address())
 }

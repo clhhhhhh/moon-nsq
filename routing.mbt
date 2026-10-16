@@ -82,6 +82,7 @@ pub fn RoutingTable::new(
   producers : Array[ProducerEndpoint],
   cooldown_ms? : Int64 = 5_000L,
 ) -> RoutingTable raise ProtocolError {
+  validate_producers(producers)
   if producers.length() == 0 {
     raise InvalidOption("routing table requires at least one producer")
   }
@@ -158,6 +159,7 @@ pub fn RoutingTable::replace(
   self : RoutingTable,
   producers : Array[ProducerEndpoint],
 ) -> Unit raise ProtocolError {
+  validate_producers(producers)
   if producers.length() == 0 {
     raise InvalidOption("routing table requires at least one producer")
   }

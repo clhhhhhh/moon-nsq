@@ -1,0 +1,568 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "clhhhhhh/moon-nsq"
+
+import {
+  "moonbitlang/core/debug",
+  "moonbitlang/core/json",
+}
+
+// Values
+pub fn attempts_exceeded() -> DeadLetterReason
+
+pub fn close_command() -> Bytes
+
+pub async fn connect(String, Int) -> Connection
+
+pub fn create_channel_operation(String, String) -> AdminOperation
+
+pub fn create_topic_operation(String) -> AdminOperation
+
+pub fn decode_frame(Bytes) -> Frame raise ProtocolError
+
+pub fn decode_message(Bytes) -> Message raise ProtocolError
+
+pub fn decode_u32(Bytes, Int) -> Int
+
+pub fn deferred_publish_command(String, Int, Bytes) -> Bytes raise ProtocolError
+
+pub fn delete_channel_operation(String, String) -> AdminOperation
+
+pub fn delete_topic_operation(String) -> AdminOperation
+
+pub fn discard_disposition() -> Disposition
+
+pub fn encode_frame(Int, Bytes) -> Bytes raise ProtocolError
+
+pub fn encode_u32(Int) -> Bytes
+
+pub fn finish_action() -> RetryAction
+
+pub fn finish_disposition() -> Disposition
+
+pub fn handler_rejected() -> DeadLetterReason
+
+pub fn invalid_payload() -> DeadLetterReason
+
+pub let magic_v2 : Bytes
+
+pub let max_frame_size : Int
+
+pub fn message_command(String, Bytes) -> Bytes raise ProtocolError
+
+pub fn multi_publish_command(String, Array[Bytes]) -> Bytes raise ProtocolError
+
+pub fn nop_command() -> Bytes
+
+pub fn pause_operation(String) -> AdminOperation
+
+pub fn publish_command(String, Bytes) -> Bytes raise ProtocolError
+
+pub fn ready_command(Int) -> Bytes raise ProtocolError
+
+pub fn requeue_command(Bytes, Int) -> Bytes raise ProtocolError
+
+pub fn requeue_disposition(Int) -> Disposition raise ProtocolError
+
+pub fn shutdown_reason() -> DeadLetterReason
+
+pub fn subscribe_command(String, String) -> Bytes raise ProtocolError
+
+pub fn tombstone_operation(String) -> AdminOperation
+
+pub fn touch_command(Bytes) -> Bytes raise ProtocolError
+
+pub fn unpause_operation(String) -> AdminOperation
+
+pub fn validate_name(String) -> Unit raise ProtocolError
+
+// Errors
+pub suberror ProtocolError {
+  InvalidFrameLength(Int)
+  UnknownFrameType(Int)
+  TruncatedFrame(Int)
+  InvalidCommand(String)
+  TruncatedMessage(Int)
+  ServerError(String)
+  UnexpectedFrame(String)
+  InvalidOption(String)
+  InvalidState(String)
+} derive(@debug.Debug)
+pub fn ProtocolError::to_repr(Self) -> @debug.Repr
+
+// Types and methods
+pub struct AdminClient {
+  host : String
+  port : Int
+  base_path : String
+} derive(@debug.Debug)
+pub fn AdminClient::health_url(Self) -> String
+pub fn AdminClient::host(Self) -> String
+pub fn AdminClient::new(String, port? : Int, base_path? : String) -> Self raise ProtocolError
+pub fn AdminClient::port(Self) -> Int
+pub fn AdminClient::stats_url(Self, format? : String) -> String raise ProtocolError
+pub fn AdminClient::to_repr(Self) -> @debug.Repr
+pub fn AdminClient::url(Self, AdminOperation) -> String raise ProtocolError
+
+pub enum AdminOperation {
+  CreateTopic(String)
+  DeleteTopic(String)
+  CreateChannel(String, String)
+  DeleteChannel(String, String)
+  Tombstone(String)
+  Pause(String)
+  Unpause(String)
+} derive(Eq, @debug.Debug)
+pub fn AdminOperation::equal(Self, Self) -> Bool
+pub fn AdminOperation::http_method(Self) -> String
+pub fn AdminOperation::is_mutating(Self) -> Bool
+pub fn AdminOperation::label(Self) -> String
+pub fn AdminOperation::not_equal(Self, Self) -> Bool
+pub fn AdminOperation::path(Self) -> String raise ProtocolError
+pub fn AdminOperation::to_repr(Self) -> @debug.Repr
+pub fn AdminOperation::validate(Self) -> Unit raise ProtocolError
+
+pub struct BackoffOptions {
+  initial_delay : Int
+  max_delay : Int
+  multiplier : Int
+} derive(@debug.Debug)
+pub fn BackoffOptions::delay_for(Self, Int) -> Int
+pub fn BackoffOptions::new(initial_delay? : Int, max_delay? : Int, multiplier? : Int) -> Self raise ProtocolError
+pub fn BackoffOptions::to_repr(Self) -> @debug.Repr
+
+pub enum BatchPush {
+  Added
+  Full
+  TooLarge
+} derive(Eq, @debug.Debug)
+pub fn BatchPush::equal(Self, Self) -> Bool
+pub fn BatchPush::not_equal(Self, Self) -> Bool
+pub fn BatchPush::to_repr(Self) -> @debug.Repr
+
+pub struct BrokerSet {
+  mut producers : Array[ProducerEndpoint]
+  mut next_index : Int
+}
+pub fn BrokerSet::length(Self) -> Int
+pub fn BrokerSet::new(Array[ProducerEndpoint]) -> Self raise ProtocolError
+pub fn BrokerSet::next(Self) -> ProducerEndpoint
+pub async fn BrokerSet::refresh(Self, Lookupd, String) -> Unit
+pub fn BrokerSet::replace(Self, Array[ProducerEndpoint]) -> Unit raise ProtocolError
+
+pub struct ChannelSpec {
+  topic : String
+  name : String
+  max_in_flight : Int
+  max_attempts : Int
+} derive(@debug.Debug)
+pub fn ChannelSpec::max_attempts(Self) -> Int
+pub fn ChannelSpec::max_in_flight(Self) -> Int
+pub fn ChannelSpec::name(Self) -> String
+pub fn ChannelSpec::new(String, String, max_in_flight? : Int, max_attempts? : Int) -> Self raise ProtocolError
+pub fn ChannelSpec::to_repr(Self) -> @debug.Repr
+pub fn ChannelSpec::topic(Self) -> String
+
+pub struct Connection {
+  // private fields
+}
+pub fn Connection::close(Self) -> Unit
+pub async fn Connection::close_gracefully(Self) -> Unit
+pub async fn Connection::finish(Self, Bytes) -> Unit
+pub async fn Connection::identify(Self, heartbeat_interval? : Int) -> Unit
+pub async fn Connection::identify_with_options(Self, ConnectionOptions) -> Unit
+pub async fn Connection::ping(Self) -> Unit
+pub async fn Connection::publish(Self, String, Bytes) -> Unit
+pub async fn Connection::publish_batch(Self, PublishBatch) -> Unit
+pub async fn Connection::publish_deferred(Self, String, Int, Bytes) -> Unit
+pub async fn Connection::ready(Self, Int) -> Unit
+pub async fn Connection::receive(Self) -> Message
+pub async fn Connection::requeue(Self, Bytes, Int) -> Unit
+pub async fn Connection::subscribe(Self, String, String) -> Unit
+pub async fn Connection::touch(Self, Bytes) -> Unit
+
+pub struct ConnectionHealth {
+  opened_at : Int64
+  mut last_activity : Int64
+  mut heartbeats_sent : Int
+  mut heartbeats_received : Int
+  mut requests : Int
+  mut request_failures : Int
+  mut bytes_read : Int64
+  mut bytes_written : Int64
+} derive(@debug.Debug)
+pub fn ConnectionHealth::age(Self, Int64) -> Int64
+pub fn ConnectionHealth::bytes_read(Self) -> Int64
+pub fn ConnectionHealth::bytes_written(Self) -> Int64
+pub fn ConnectionHealth::failure_rate_basis_points(Self) -> Int
+pub fn ConnectionHealth::heartbeats_received(Self) -> Int
+pub fn ConnectionHealth::heartbeats_sent(Self) -> Int
+pub fn ConnectionHealth::idle_for(Self, Int64) -> Int64
+pub fn ConnectionHealth::is_alive(Self, Int64, Int64) -> Bool
+pub fn ConnectionHealth::last_activity(Self) -> Int64
+pub fn ConnectionHealth::new(Int64) -> Self
+pub fn ConnectionHealth::opened_at(Self) -> Int64
+pub fn ConnectionHealth::record_failure(Self, Int64) -> Unit
+pub fn ConnectionHealth::record_heartbeat_received(Self, Int64) -> Unit
+pub fn ConnectionHealth::record_heartbeat_sent(Self, Int64) -> Unit
+pub fn ConnectionHealth::record_read(Self, Int64, Int) -> Unit raise ProtocolError
+pub fn ConnectionHealth::record_request(Self, Int64) -> Unit
+pub fn ConnectionHealth::record_success(Self, Int64) -> Unit
+pub fn ConnectionHealth::record_write(Self, Int64, Int) -> Unit raise ProtocolError
+pub fn ConnectionHealth::request_failures(Self) -> Int
+pub fn ConnectionHealth::requests(Self) -> Int
+pub fn ConnectionHealth::success_rate_basis_points(Self) -> Int
+pub fn ConnectionHealth::to_repr(Self) -> @debug.Repr
+
+pub struct ConnectionLease {
+  endpoint : ProducerEndpoint
+  generation : Int
+  mut released : Bool
+} derive(@debug.Debug)
+pub fn ConnectionLease::endpoint(Self) -> ProducerEndpoint
+pub fn ConnectionLease::generation(Self) -> Int
+pub fn ConnectionLease::is_released(Self) -> Bool
+pub fn ConnectionLease::to_repr(Self) -> @debug.Repr
+
+pub struct ConnectionOptions {
+  client_id : String
+  hostname : String
+  heartbeat_interval : Int
+  output_buffer_size : Int
+  output_buffer_timeout : Int
+  message_timeout : Int
+  sample_rate : Int
+  tls_v1 : Bool
+  feature_negotiation : Bool
+} derive(@debug.Debug)
+pub fn ConnectionOptions::new(client_id? : String, hostname? : String, heartbeat_interval? : Int, output_buffer_size? : Int, output_buffer_timeout? : Int, message_timeout? : Int, sample_rate? : Int, tls_v1? : Bool, feature_negotiation? : Bool) -> Self raise ProtocolError
+pub fn ConnectionOptions::to_repr(Self) -> @debug.Repr
+pub fn ConnectionOptions::validate(Self) -> Unit raise ProtocolError
+
+pub struct ConnectionPool {
+  routing : RoutingTable
+  mut generation : Int
+  max_connections : Int
+  mut active : Int
+  stats : PoolStats
+} derive(@debug.Debug)
+pub fn ConnectionPool::active(Self) -> Int
+pub fn ConnectionPool::capacity(Self) -> Int
+pub fn ConnectionPool::lease(Self, Int64) -> ConnectionLease raise ProtocolError
+pub fn ConnectionPool::mark_failure(Self, ConnectionLease, Int64) -> Bool
+pub fn ConnectionPool::mark_success(Self, ConnectionLease) -> Bool
+pub fn ConnectionPool::new(Array[ProducerEndpoint], max_connections? : Int) -> Self raise ProtocolError
+pub fn ConnectionPool::refresh(Self, Array[ProducerEndpoint]) -> Unit raise ProtocolError
+pub fn ConnectionPool::release(Self, ConnectionLease) -> Unit
+pub fn ConnectionPool::stats(Self) -> PoolStats
+pub fn ConnectionPool::to_repr(Self) -> @debug.Repr
+
+pub struct Consumer {
+  topic : String
+  channel : String
+  options : ConsumerOptions
+  mut started : Bool
+  mut received : Int
+  mut finished : Int
+  mut requeued : Int
+  mut discarded : Int
+  mut touched : Int
+  // private fields
+}
+pub async fn Consumer::close(Self) -> Unit
+pub async fn Consumer::connect(String, Int, String, String, options? : ConsumerOptions, connection_options? : ConnectionOptions) -> Self
+pub async fn Consumer::continue_delivery(Self) -> Unit
+pub async fn Consumer::discard(Self, Message) -> Unit
+pub async fn Consumer::finish(Self, Message) -> Unit
+pub async fn Consumer::pause(Self) -> Unit
+pub async fn Consumer::process_one(Self, async (Message) -> Disposition) -> Unit
+pub async fn Consumer::receive(Self) -> Message
+pub async fn Consumer::requeue(Self, Message) -> Unit
+pub async fn Consumer::start(Self) -> Unit
+pub fn Consumer::stats(Self) -> ConsumerStats
+pub async fn Consumer::touch(Self, Message) -> Unit
+
+pub struct ConsumerOptions {
+  max_in_flight : Int
+  requeue_delay : Int
+  max_attempts : Int
+  touch_interval : Int
+} derive(@debug.Debug)
+pub fn ConsumerOptions::new(max_in_flight? : Int, requeue_delay? : Int, max_attempts? : Int, touch_interval? : Int) -> Self raise ProtocolError
+pub fn ConsumerOptions::to_repr(Self) -> @debug.Repr
+pub fn ConsumerOptions::validate(Self) -> Unit raise ProtocolError
+
+pub struct ConsumerStats {
+  received : Int
+  finished : Int
+  requeued : Int
+  discarded : Int
+  touched : Int
+} derive(@debug.Debug)
+pub fn ConsumerStats::to_repr(Self) -> @debug.Repr
+
+pub enum DeadLetterReason {
+  AttemptsExceeded
+  HandlerRejected
+  InvalidPayload
+  Shutdown
+} derive(Eq, @debug.Debug)
+pub fn DeadLetterReason::equal(Self, Self) -> Bool
+pub fn DeadLetterReason::not_equal(Self, Self) -> Bool
+pub fn DeadLetterReason::to_repr(Self) -> @debug.Repr
+
+pub struct DeadLetterStats {
+  mut sent : Int
+  mut failed : Int
+  mut last_reason : DeadLetterReason?
+} derive(@debug.Debug)
+pub fn DeadLetterStats::failed(Self) -> Int
+pub fn DeadLetterStats::new() -> Self
+pub fn DeadLetterStats::record_failure(Self) -> Unit
+pub fn DeadLetterStats::record_sent(Self, DeadLetterReason) -> Unit
+pub fn DeadLetterStats::sent(Self) -> Int
+pub fn DeadLetterStats::to_repr(Self) -> @debug.Repr
+
+pub struct DeliveryWindow {
+  limit : Int
+  mut in_flight : Int
+  mut accepted : Int
+  mut settled : Int
+} derive(@debug.Debug)
+pub fn DeliveryWindow::accepted(Self) -> Int
+pub fn DeliveryWindow::available(Self) -> Int
+pub fn DeliveryWindow::in_flight(Self) -> Int
+pub fn DeliveryWindow::limit(Self) -> Int
+pub fn DeliveryWindow::new(Int) -> Self raise ProtocolError
+pub fn DeliveryWindow::reset(Self) -> Int
+pub fn DeliveryWindow::settle(Self) -> Bool
+pub fn DeliveryWindow::settled(Self) -> Int
+pub fn DeliveryWindow::to_repr(Self) -> @debug.Repr
+pub fn DeliveryWindow::try_accept(Self) -> Bool
+pub fn DeliveryWindow::utilization_basis_points(Self) -> Int
+
+pub enum Disposition {
+  Finish
+  Requeue(Int)
+  Discard
+} derive(@debug.Debug)
+pub fn Disposition::to_repr(Self) -> @debug.Repr
+
+pub enum Frame {
+  Response(Bytes)
+  Error(Bytes)
+  Message(Bytes)
+} derive(Eq, @debug.Debug)
+pub fn Frame::equal(Self, Self) -> Bool
+pub fn Frame::not_equal(Self, Self) -> Bool
+pub fn Frame::to_repr(Self) -> @debug.Repr
+
+pub struct FrameStream {
+  mut buffered : Bytes
+}
+pub fn FrameStream::buffered_bytes(Self) -> Int
+pub fn FrameStream::clear(Self) -> Unit
+pub fn FrameStream::new() -> Self
+pub fn FrameStream::next(Self) -> Frame? raise ProtocolError
+pub fn FrameStream::push(Self, Bytes) -> Unit raise ProtocolError
+
+type IdentifyPayload derive(ToJson)
+pub fn IdentifyPayload::to_json(Self) -> Json
+
+pub struct LatencyHistogram {
+  mut samples : Int
+  mut total_ms : Int64
+  mut minimum_ms : Int
+  mut maximum_ms : Int
+  buckets : Array[Int]
+} derive(@debug.Debug)
+pub fn LatencyHistogram::count(Self) -> Int
+pub fn LatencyHistogram::maximum(Self) -> Int
+pub fn LatencyHistogram::mean(Self) -> Int
+pub fn LatencyHistogram::merge(Self, Self) -> Unit
+pub fn LatencyHistogram::minimum(Self) -> Int
+pub fn LatencyHistogram::new() -> Self
+pub fn LatencyHistogram::observe(Self, Int) -> Unit raise ProtocolError
+pub fn LatencyHistogram::percentile(Self, Int) -> Int raise ProtocolError
+pub fn LatencyHistogram::to_repr(Self) -> @debug.Repr
+pub fn LatencyHistogram::total(Self) -> Int64
+
+type LookupResponse derive(@json.FromJson)
+pub fn LookupResponse::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+
+pub struct Lookupd {
+  base_url : String
+} derive(@debug.Debug)
+pub async fn Lookupd::lookup(Self, String) -> Array[ProducerEndpoint]
+pub fn Lookupd::new(String, port? : Int) -> Self raise ProtocolError
+pub async fn Lookupd::ping(Self) -> Bool
+pub fn Lookupd::to_repr(Self) -> @debug.Repr
+
+pub struct Message {
+  timestamp : Int64
+  attempts : Int
+  id : Bytes
+  body : Bytes
+} derive(@debug.Debug)
+pub fn Message::to_repr(Self) -> @debug.Repr
+
+pub struct PoolStats {
+  mut leases : Int
+  mut releases : Int
+  mut failures : Int
+  mut successes : Int
+  mut rejected : Int
+} derive(@debug.Debug)
+pub fn PoolStats::failures(Self) -> Int
+pub fn PoolStats::leases(Self) -> Int
+pub fn PoolStats::new() -> Self
+pub fn PoolStats::rejected(Self) -> Int
+pub fn PoolStats::releases(Self) -> Int
+pub fn PoolStats::successes(Self) -> Int
+pub fn PoolStats::to_repr(Self) -> @debug.Repr
+
+pub struct Producer {
+  topic : String
+  mut published : Int
+  mut deferred : Int
+  mut batches : Int
+  mut batch_messages : Int
+  // private fields
+}
+pub fn Producer::close(Self) -> Unit
+pub async fn Producer::connect(String, Int, String, options? : ConnectionOptions) -> Self
+pub fn Producer::new_batch(Self, max_messages? : Int, max_bytes? : Int) -> PublishBatch raise ProtocolError
+pub async fn Producer::ping(Self) -> Unit
+pub async fn Producer::publish(Self, Bytes) -> Unit
+pub async fn Producer::publish_batch(Self, PublishBatch) -> Unit
+pub async fn Producer::publish_deferred(Self, Int, Bytes) -> Unit
+pub fn Producer::stats(Self) -> ProducerStats
+
+pub struct ProducerEndpoint {
+  broadcast_address : String
+  tcp_port : Int
+  http_port : Int
+  version : String
+} derive(@debug.Debug, @json.FromJson)
+pub fn ProducerEndpoint::address(Self) -> String
+pub fn ProducerEndpoint::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ProducerEndpoint::new(String, Int, http_port? : Int, version? : String) -> Self raise ProtocolError
+pub fn ProducerEndpoint::to_repr(Self) -> @debug.Repr
+
+pub struct ProducerHealth {
+  endpoint : ProducerEndpoint
+  mut failures : Int
+  mut successes : Int
+  mut last_failure_ms : Int64
+  mut healthy : Bool
+} derive(@debug.Debug)
+pub fn ProducerHealth::endpoint(Self) -> ProducerEndpoint
+pub fn ProducerHealth::failures(Self) -> Int
+pub fn ProducerHealth::is_healthy(Self) -> Bool
+pub fn ProducerHealth::mark_failure(Self, Int64) -> Unit
+pub fn ProducerHealth::mark_success(Self) -> Unit
+pub fn ProducerHealth::new(ProducerEndpoint) -> Self
+pub fn ProducerHealth::recover_if_ready(Self, Int64, Int64) -> Bool
+pub fn ProducerHealth::to_repr(Self) -> @debug.Repr
+
+pub struct ProducerMetrics {
+  mut published : Int
+  mut failed : Int
+  mut bytes : Int64
+  latency : LatencyHistogram
+} derive(@debug.Debug)
+pub fn ProducerMetrics::bytes(Self) -> Int64
+pub fn ProducerMetrics::failed(Self) -> Int
+pub fn ProducerMetrics::latency(Self) -> LatencyHistogram
+pub fn ProducerMetrics::new() -> Self
+pub fn ProducerMetrics::published(Self) -> Int
+pub fn ProducerMetrics::record_failure(Self) -> Unit
+pub fn ProducerMetrics::record_success(Self, Int, Int) -> Unit raise ProtocolError
+pub fn ProducerMetrics::to_repr(Self) -> @debug.Repr
+
+pub struct ProducerStats {
+  published : Int
+  deferred : Int
+  batches : Int
+  batch_messages : Int
+} derive(@debug.Debug)
+pub fn ProducerStats::to_repr(Self) -> @debug.Repr
+
+pub struct PublishBatch {
+  topic : String
+  max_messages : Int
+  max_bytes : Int
+  mut bodies : Array[Bytes]
+  mut payload_bytes : Int
+} derive(@debug.Debug)
+pub fn PublishBatch::clear(Self) -> Unit
+pub fn PublishBatch::command(Self) -> Bytes raise ProtocolError
+pub fn PublishBatch::encoded_size(Self) -> Int
+pub fn PublishBatch::is_empty(Self) -> Bool
+pub fn PublishBatch::length(Self) -> Int
+pub fn PublishBatch::new(String, max_messages? : Int, max_bytes? : Int) -> Self raise ProtocolError
+pub fn PublishBatch::push(Self, Bytes) -> BatchPush
+pub fn PublishBatch::take_command(Self) -> Bytes raise ProtocolError
+pub fn PublishBatch::to_repr(Self) -> @debug.Repr
+
+pub enum RetryAction {
+  Retry(Int)
+  DeadLetter(DeadLetterReason)
+  Finish
+} derive(Eq, @debug.Debug)
+pub fn RetryAction::equal(Self, Self) -> Bool
+pub fn RetryAction::not_equal(Self, Self) -> Bool
+pub fn RetryAction::to_repr(Self) -> @debug.Repr
+
+pub struct RetryPolicy {
+  max_attempts : Int
+  initial_delay : Int
+  max_delay : Int
+  multiplier : Int
+  jitter_window : Int
+} derive(@debug.Debug)
+pub fn RetryPolicy::decide(Self, Message, DeadLetterReason, Int) -> RetryAction
+pub fn RetryPolicy::delay_for(Self, Int) -> Int
+pub fn RetryPolicy::delay_with_seed(Self, Int, Int) -> Int
+pub fn RetryPolicy::new(max_attempts? : Int, initial_delay? : Int, max_delay? : Int, multiplier? : Int, jitter_window? : Int) -> Self raise ProtocolError
+pub fn RetryPolicy::to_repr(Self) -> @debug.Repr
+pub fn RetryPolicy::validate(Self) -> Unit raise ProtocolError
+
+pub struct RoutingTable {
+  mut entries : Array[ProducerHealth]
+  mut cursor : Int
+  cooldown_ms : Int64
+} derive(@debug.Debug)
+pub fn RoutingTable::choose(Self, Int64) -> ProducerEndpoint
+pub fn RoutingTable::length(Self) -> Int
+pub fn RoutingTable::mark_failure(Self, String, Int64) -> Bool
+pub fn RoutingTable::mark_success(Self, String) -> Bool
+pub fn RoutingTable::new(Array[ProducerEndpoint], cooldown_ms? : Int64) -> Self raise ProtocolError
+pub fn RoutingTable::replace(Self, Array[ProducerEndpoint]) -> Unit raise ProtocolError
+pub fn RoutingTable::to_repr(Self) -> @debug.Repr
+
+pub struct TopicSpec {
+  name : String
+  partitions : Int
+  retention_days : Int
+  max_message_bytes : Int
+} derive(@debug.Debug)
+pub fn TopicSpec::max_message_bytes(Self) -> Int
+pub fn TopicSpec::name(Self) -> String
+pub fn TopicSpec::new(String, partitions? : Int, retention_days? : Int, max_message_bytes? : Int) -> Self raise ProtocolError
+pub fn TopicSpec::partitions(Self) -> Int
+pub fn TopicSpec::retention_days(Self) -> Int
+pub fn TopicSpec::to_repr(Self) -> @debug.Repr
+
+pub struct TopologyPlan {
+  topic : TopicSpec
+  channels : Array[ChannelSpec]
+} derive(@debug.Debug)
+pub fn TopologyPlan::channels(Self) -> Array[ChannelSpec]
+pub fn TopologyPlan::contains_channel(Self, String) -> Bool
+pub fn TopologyPlan::new(TopicSpec, Array[ChannelSpec]) -> Self raise ProtocolError
+pub fn TopologyPlan::to_repr(Self) -> @debug.Repr
+pub fn TopologyPlan::topic(Self) -> TopicSpec
+
+// Type aliases
+
+// Traits

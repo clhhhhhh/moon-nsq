@@ -84,7 +84,7 @@ pub async fn Producer::publish_batch(
 }
 
 ///|
-/// Verifies the live connection using an NSQ `NOP` round trip.
+/// Sends a one-way `NOP`; no acknowledgement is provided by NSQ.
 pub async fn Producer::ping(self : Producer) -> Unit {
   self.connection.ping()
 }

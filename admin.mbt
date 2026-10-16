@@ -97,7 +97,7 @@ pub fn AdminOperation::path(
 
 ///|
 /// Returns the HTTP method used for an administrative operation.
-/// nsqd exposes these state-changing administration endpoints as GET routes.
+/// NSQ v1 administration endpoints require POST.
 pub fn AdminOperation::http_method(self : AdminOperation) -> String {
   match self {
     CreateTopic(_)
@@ -106,14 +106,14 @@ pub fn AdminOperation::http_method(self : AdminOperation) -> String {
     | DeleteChannel(_, _)
     | Tombstone(_)
     | Pause(_)
-    | Unpause(_) => "GET"
+    | Unpause(_) => "POST"
   }
 }
 
 ///|
 /// Returns whether the operation changes broker state.
 pub fn AdminOperation::is_mutating(self : AdminOperation) -> Bool {
-  self.http_method() == "GET"
+  self.http_method() == "POST"
 }
 
 ///|

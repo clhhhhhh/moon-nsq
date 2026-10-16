@@ -140,16 +140,16 @@ pub async fn Connection::publish_batch(
   self : Connection,
   batch : PublishBatch,
 ) -> Unit {
-  let command = batch.take_command()
+  let command = batch.command()
   self.tcp.write(command)
   expect_ok(self.tcp)
+  batch.clear()
 }
 
 ///|
-/// Sends `NOP` and waits for an `OK`, verifying that the connection remains usable.
+/// Writes `NOP`. NSQ sends no response; this does not confirm broker liveness.
 pub async fn Connection::ping(self : Connection) -> Unit {
   self.tcp.write(nop_command())
-  expect_ok(self.tcp)
 }
 
 ///|

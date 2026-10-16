@@ -2,7 +2,7 @@
 
 使用 MoonBit 编写的 NSQ TCP V2 客户端实验性实现，作为 MoonBit 开源生态比赛项目持续开发。
 
-**当前状态：开发中。** 已实现基础协议、异步 TCP API 和部分辅助组件，并有单元测试及模拟 TCP 服务测试。尚未完成真实 `nsqd` / `nsqlookupd` 联调，不能承诺生产环境可用性。截至 2026-10-16，尚未确认发布到 Mooncakes，请从源码使用。
+**当前状态：开发中，已发布 `0.1.0`。** 已实现基础协议、异步 TCP API 和部分辅助组件，并有单元测试及模拟 TCP 服务测试。尚未完成真实 `nsqd` / `nsqlookupd` 联调，不能承诺生产环境可用性。截至 2026-10-16，Mooncakes 已可检索到 `clhhhhhh/moon-nsq@0.1.0`。
 
 ## 已实现的功能
 
@@ -33,7 +33,14 @@ moon test --target wasm --deny-warn
 
 默认目标为 `wasm`，直接依赖 `moonbitlang/async@0.22.1`。网络功能使用 MoonBit 运行器提供的能力，不是可直接用于浏览器的客户端。Native 目标曾通过本地检查，但本机缺少 C 编译器，未完成 Native 构建和测试；其他目标未验证。
 
-包名为 `clhhhhhh/moon-nsq`。由于尚未确认发布，不应把 `moon add clhhhhhh/moon-nsq` 当作已经验证可用的安装方式。
+在已有 MoonBit 项目目录中，可从注册表添加已发布版本：
+
+```sh
+moon update
+moon add clhhhhhh/moon-nsq@0.1.0
+```
+
+注册表发布和可检索状态已确认；独立下游项目的安装、构建验证尚未完成。包导入方式可参考本仓库的 `cmd/main/moon.pkg`。
 
 ## 命令行发布示例
 

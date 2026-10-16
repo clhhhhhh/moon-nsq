@@ -1,0 +1,8 @@
+import {
+  "clhhhhhh/moon-nsq" @lib,
+  "moonbitlang/async",
+  "moonbitlang/core/encoding/utf8",
+  "moonbitlang/core/env",
+}
+
+pkgtype(kind: "executable")
